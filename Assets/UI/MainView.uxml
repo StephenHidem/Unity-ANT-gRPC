@@ -1,0 +1,25 @@
+<engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI/MainView.uss?fileID=7433441132597879392&amp;guid=d7962998f0ae1b14eb3f4f212c3417f7&amp;type=3#MainView" />
+    <engine:VisualElement name="background">
+        <engine:VisualElement name="main-container">
+            <engine:GroupBox text="ANT Radio" name="ant-radio" style="margin-top: 0; margin-bottom: 0;">
+                <engine:VisualElement name="radio-properties" style="-unity-font-style: normal; font-size: 14px;">
+                    <engine:Label text="Label" name="product-description" style="margin-bottom: 0; margin-top: 0;" />
+                    <engine:Label text="Label" name="server-ip" style="margin-top: 0; margin-bottom: 0;" />
+                    <engine:Label text="Label" name="serial-number" style="margin-top: 0; margin-bottom: 0;" />
+                    <engine:Label text="Label" name="version" style="margin-bottom: 0; margin-top: 0;" />
+                </engine:VisualElement>
+            </engine:GroupBox>
+            <engine:ListView name="device-list" item-template="project://database/Assets/UI/ListEntry.uxml?fileID=9197481963319205126&amp;guid=a2ee2d4542134a142b091ade835261fd&amp;type=3#ListEntry" />
+            <engine:VisualElement name="right-container">
+                <engine:VisualElement name="details-container">
+                    <engine:VisualElement name="details">
+                        <engine:VisualElement name="device-portrait" />
+                    </engine:VisualElement>
+                    <engine:Label text="Label" name="device-name" />
+                    <engine:Label text="Label" name="device-class" />
+                </engine:VisualElement>
+            </engine:VisualElement>
+        </engine:VisualElement>
+    </engine:VisualElement>
+</engine:UXML>

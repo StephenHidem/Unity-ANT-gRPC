@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>SmallEarthTech.AntPlus</id>
+    <version>4.0.0</version>
+    <title>ANT+ Class Library</title>
+    <authors>Stephen Hidem</authors>
+    <owners></owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <license type="expression">MIT</license>
+    <licenseUrl>https://licenses.nuget.org/MIT</licenseUrl>
+    <icon>PackageLogo.png</icon>
+    <readme>readme.md</readme>
+    <projectUrl>https://stephenhidem.github.io/AntPlus</projectUrl>
+    <description>Enables applications to interface and acquire data from a variety of ANT+ sensor sources. The primary class is AntPlus and it contains device profiles of ANT+ devices and common data pages.</description>
+    <releaseNotes>1. All device profiles employ the CommunityToolkit.Mvvm. This makes it much easier tor the device profiles to participate as view models.
+2. ChannelCount was added to AntDevice and device profiles to enable scaling the device timeouts based on the number of missed messags.
+3. Device timeouts can be disabled by setting the timeout argument to -1 (Timeout.Infinite).
+4. Added TimeoutOptions class to provide support to ANT+ hosting extensions.</releaseNotes>
+    <copyright>© Stephen Hidem 2023. All rights reserved.</copyright>
+    <tags>ant ant+ antplus smallearthtech</tags>
+    <repository type="git" url="https://github.com/StephenHidem/AntPlus" commit="4009252dff1e4f6bcda36b6b0041486552134bc5" />
+    <dependencies>
+      <group targetFramework=".NETStandard2.0">
+        <dependency id="SmallEarthTech.AntRadioInterface" version="3.0.0" exclude="Build,Analyzers" />
+        <dependency id="CommunityToolkit.Mvvm" version="8.2.2" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.Extensions.Configuration.Abstractions" version="8.0.0" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.Extensions.Logging.Abstractions" version="8.0.1" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.Extensions.Options" version="8.0.2" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+  </metadata>
+</package>

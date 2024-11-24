@@ -1,0 +1,147 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>SmallEarthTech.AntPlus.Extensions.Hosting</name>
+    </assembly>
+    <members>
+        <member name="T:SmallEarthTech.AntPlus.Extensions.Hosting.AntCollection">
+            <summary>
+            This class largely mirrors <see cref="T:SmallEarthTech.AntPlus.AntDeviceCollection"/> but is designed specifically to be integrated into
+            an application via dependency injection.
+            </summary>
+        </member>
+        <member name="F:SmallEarthTech.AntPlus.Extensions.Hosting.AntCollection.CollectionLock">
+            <summary>
+            The collection lock typically used by WPF applications to synchronize UI updates when devices are added or
+            removed from the collection. For example, in the code behind for a window that is using this collection
+            would include the following line in its constructor -
+            <code>BindingOperations.EnableCollectionSynchronization(viewModel.AntDevices, viewModel.AntDevices.CollectionLock);</code>
+            </summary>
+        </member>
+        <member name="M:SmallEarthTech.AntPlus.Extensions.Hosting.AntCollection.#ctor(System.IServiceProvider,SmallEarthTech.AntRadioInterface.IAntRadio,Microsoft.Extensions.Logging.ILogger{SmallEarthTech.AntPlus.Extensions.Hosting.AntCollection},Microsoft.Extensions.Options.IOptions{SmallEarthTech.AntPlus.TimeoutOptions})">
+            <summary>
+            Initializes a new instance of the <see cref="T:SmallEarthTech.AntPlus.Extensions.Hosting.AntCollection"/> class. The ANT radio is initialized for continuous scan mode.
+            </summary>
+            <param name="services">The service provider.</param>
+            <param name="antRadio">The ANT radio.</param>
+            <param name="logger">The logger.</param>
+            <param name="options">The ANT device timeout options.</param>
+        </member>
+        <member name="M:SmallEarthTech.AntPlus.Extensions.Hosting.AntCollection.StartScanning">
+            <summary>
+            Initializes the ANT radio for continuous scan mode and setup ANT channels for use by this collection.
+            </summary>
+            <returns>Task of type void</returns>
+        </member>
+        <member name="M:SmallEarthTech.AntPlus.Extensions.Hosting.AntCollection.MessageHandler(System.Object,SmallEarthTech.AntRadioInterface.AntResponse)">
+            <summary>
+            The collection message handler. All messages received from the ANT radio pass through here. New devices are added to the
+            collection and the message is dispatched to the device for processing.
+            </summary>
+            <param name="sender">The ANT radio.</param>
+            <param name="e">The ANT response.</param>
+        </member>
+        <member name="M:SmallEarthTech.AntPlus.Extensions.Hosting.AntCollection.Add(SmallEarthTech.AntPlus.AntDevice)">
+            <summary>Adds the specified <see cref="T:SmallEarthTech.AntPlus.AntDevice"/> to the end of the collection.</summary>
+            <param name="item">The <see cref="T:SmallEarthTech.AntPlus.AntDevice"/>.</param>
+        </member>
+        <member name="M:SmallEarthTech.AntPlus.Extensions.Hosting.AntCollection.Remove(SmallEarthTech.AntPlus.AntDevice)">
+            <summary>Removes the specified <see cref="T:SmallEarthTech.AntPlus.AntDevice"/> from the collection.</summary>
+            <param name="item">The <see cref="T:SmallEarthTech.AntPlus.AntDevice"/>.</param>
+            <returns>true if item is successfully removed; otherwise, false. This method also returns false if item was not found in the original collection.</returns>
+        </member>
+        <member name="M:SmallEarthTech.AntPlus.Extensions.Hosting.AntCollection.GetAntDeviceType(SmallEarthTech.AntRadioInterface.ChannelId,System.Byte[])">
+            <summary>
+            Gets the implementation type of the ANT device.
+            </summary>
+            <param name="channelId">The channel identifier.</param>
+            <param name="page">The page received from the device.</param>
+            <returns>The implementation type of the device.</returns>
+        </member>
+        <member name="M:SmallEarthTech.AntPlus.Extensions.Hosting.AntCollection.Dispose">
+            <summary>
+            Release the ANT channels.
+            </summary>
+        </member>
+        <member name="T:SmallEarthTech.AntPlus.Extensions.Hosting.AntCollection.SendMessageChannel">
+            <summary>
+            This implementation of IAntChannel supports sending messages to ANT devices. This implementation is very
+            limited in its support; only <see cref="M:SmallEarthTech.AntPlus.Extensions.Hosting.AntCollection.SendMessageChannel.SendAcknowledgedData(System.Byte[],System.UInt32)"/> and <see cref="M:SmallEarthTech.AntPlus.Extensions.Hosting.AntCollection.SendMessageChannel.SendAcknowledgedDataAsync(System.Byte[],System.UInt32)"/>
+            are implemented. It is only intended to be used by the <see cref="T:SmallEarthTech.AntPlus.Extensions.Hosting.AntCollection"/> class to provide the IAntChannel
+            argument when creating ANT devices. All messages to be sent to devices are coordinated by this class.
+            </summary>
+            <remarks>
+            <see cref="T:SmallEarthTech.AntPlus.Extensions.Hosting.AntCollection"/> passes an array of ANT channels to send messages. The messaging strategy is to find a channel that is not
+            busy and dispatch that message on that channel.
+            </remarks>
+            <seealso cref="T:SmallEarthTech.AntRadioInterface.IAntChannel" />
+        </member>
+        <member name="T:SmallEarthTech.AntPlus.Extensions.Hosting.HostExtensions">
+            <summary>
+            This class provides static methods to configure the application host builder. MAUI apps and standard Windows apps are supported. 
+            </summary>
+        </member>
+        <member name="F:SmallEarthTech.AntPlus.Extensions.Hosting.HostExtensions.ServiceCollection">
+            <summary>
+            Gets the service collection. This allows the <see cref="T:SmallEarthTech.AntPlus.Extensions.Hosting.AntCollection"/> to enumerate the service collection to find
+            the desired implementation type.
+            </summary>
+        </member>
+        <member name="M:SmallEarthTech.AntPlus.Extensions.Hosting.HostExtensions.UseAntPlus(Microsoft.Extensions.Hosting.IHostBuilder)">
+            <summary>
+            Adds AntPlus classes to host builder service collection.
+            </summary>
+            <param name="builder">The host app builder</param>
+            <returns>The host app builder</returns>
+        </member>
+        <member name="M:SmallEarthTech.AntPlus.Extensions.Hosting.HostExtensions.UseAntPlus(Microsoft.Maui.Hosting.MauiAppBuilder)">
+            <summary>
+            Adds AntPlus classes to MAUI builder service collection.
+            </summary>
+            <param name="builder">The MAUI host app builder</param>
+            <returns>The MAUI host app builder</returns>
+        </member>
+        <member name="T:SmallEarthTech.AntPlus.Extensions.Hosting.ISelectImplementation">
+            <summary>
+            This interface defines a single method to get the implementation type of an ANT device.
+            </summary>
+        </member>
+        <member name="M:SmallEarthTech.AntPlus.Extensions.Hosting.ISelectImplementation.SelectImplementationType(System.Byte[])">
+            <summary>
+            Selects the type of the implementation.
+            </summary>
+            <param name="page">The data page used to pick an implementation.</param>
+            <returns>null if an implementation could not be found.</returns>
+        </member>
+        <member name="T:SmallEarthTech.AntPlus.Extensions.Hosting.SelectBicyclePowerImplementation">
+            <summary>
+            Selects the bicycle power implementation type.
+            </summary>
+        </member>
+        <member name="M:SmallEarthTech.AntPlus.Extensions.Hosting.SelectBicyclePowerImplementation.SelectImplementationType(System.Byte[])">
+            <summary>
+            Gets the type of the bicycle power sensor.
+            </summary>
+            <remarks>
+            <see cref="T:SmallEarthTech.AntPlus.DeviceProfiles.BicyclePower.CrankTorqueFrequencySensor"/> sensors only broadcast their main page. Other bicycle power sensors broadcast
+            any number of other pages. This allows the method to determine the sensor type.
+            </remarks>
+            <inheritdoc />
+        </member>
+        <member name="T:SmallEarthTech.AntPlus.Extensions.Hosting.SelectFitnessEquipmentImplementation">
+            <summary>
+            Selects the fitness equipment implementation type.
+            </summary>
+        </member>
+        <member name="M:SmallEarthTech.AntPlus.Extensions.Hosting.SelectFitnessEquipmentImplementation.SelectImplementationType(System.Byte[])">
+            <summary>
+            Gets the type of the fitness equipment.
+            </summary>
+            <remarks>
+            The fitness equipment type can be determined from the <see cref="F:SmallEarthTech.AntPlus.DeviceProfiles.FitnessEquipment.FitnessEquipment.DataPage.GeneralFEData"/> page
+            or pages specific to the equipment type. Any other page will return null.
+            </remarks>
+            <inheritdoc />
+        </member>
+    </members>
+</doc>

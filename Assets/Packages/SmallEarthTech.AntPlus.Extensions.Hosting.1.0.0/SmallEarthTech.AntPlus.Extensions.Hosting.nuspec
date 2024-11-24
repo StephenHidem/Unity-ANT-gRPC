@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>SmallEarthTech.AntPlus.Extensions.Hosting</id>
+    <version>1.0.0</version>
+    <title>ANT+ Class Library Hosting Extensions</title>
+    <authors>Stephen Hidem</authors>
+    <owners></owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <license type="expression">MIT</license>
+    <licenseUrl>https://licenses.nuget.org/MIT</licenseUrl>
+    <icon>PackageLogo.png</icon>
+    <readme>readme.md</readme>
+    <description>Useful ANT+ extensions for hosting in DI containers. Simple and easy to use! Includes support for .NET MAUI and Windows apps.</description>
+    <releaseNotes>Hosting extensions for the ANT+ Class Library supporting .NET MAUI and Window applications using depencency injection (made easy!).</releaseNotes>
+    <copyright>© Stephen Hidem 2024. All rights reserved.</copyright>
+    <tags>ant ant+ antplus smallearthtech</tags>
+    <dependencies>
+      <group targetFramework=".NETStandard2.1">
+        <dependency id="SmallEarthTech.AntPlus" version="4.0.0" exclude="Build,Analyzers" />
+        <dependency id="SmallEarthTech.AntRadioInterface" version="3.0.0" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.Extensions.Hosting" version="8.0.0" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.Maui.Core" version="8.0.80" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+  </metadata>
+</package>

@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+  <metadata>
+    <id>SmallEarthTech.AntRadioInterface</id>
+    <version>3.0.0</version>
+    <title>ANT+ Radio Interface Class Library</title>
+    <authors>Stephen Hidem</authors>
+    <owners></owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <license type="expression">MIT</license>
+    <licenseUrl>https://licenses.nuget.org/MIT</licenseUrl>
+    <icon>PackageLogo.png</icon>
+    <readme>readme.md</readme>
+    <projectUrl>https://stephenhidem.github.io/AntPlus</projectUrl>
+    <description>The AntRadioInterface defines an interface to interact with an ANT radio to send and receive from an ANT device. Use this package to create a concrete implementation of an ANT radio.</description>
+    <releaseNotes>1. IAntChannel - Added asynchronous methods to SendAcknowledged and SendExtAcknowledged messages.
+2. IAntRadio - Added Version property to interface declaration.</releaseNotes>
+    <copyright>© Stephen Hidem 2023. All rights reserved.</copyright>
+    <tags>ant ant+ antplus dynastream smallearthtech</tags>
+    <repository type="git" url="https://github.com/StephenHidem/AntPlus" commit="4009252dff1e4f6bcda36b6b0041486552134bc5" />
+    <dependencies>
+      <group targetFramework=".NETStandard2.0" />
+    </dependencies>
+  </metadata>
+</package>
