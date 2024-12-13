@@ -72,7 +72,6 @@ public static class UnityLoggerExtensions
 {
     public static ILoggingBuilder AddUnityLogger(this ILoggingBuilder builder)
     {
-        //builder.AddConfiguration();
         builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<ILoggerProvider, UnityLoggerProvider>());
         return builder;
     }

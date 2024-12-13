@@ -10,9 +10,10 @@ public class AntDeviceListController
 {
     AntCollection devices;
     bool updateList, clearDetails;
+    object deviceListLock = new object();
 
     // UI element references
-    ListView m_AntDeviceList;
+    ListView m_AntDeviceListView;
     Label m_DeviceClassLabel;
     Label m_DeviceNameLabel;
     VisualElement m_DevicePortrait;
@@ -22,63 +23,63 @@ public class AntDeviceListController
         devices = antDevices;
         devices.CollectionChanged += Devices_CollectionChanged;
 
-        m_AntDeviceList = root.Q<ListView>("device-list");
+        m_AntDeviceListView = root.Q<ListView>("device-list");
 
         // Store references to the selected character info elements
         m_DeviceClassLabel = root.Q<Label>("device-class");
         m_DeviceNameLabel = root.Q<Label>("device-name");
         m_DevicePortrait = root.Q<VisualElement>("device-portrait");
 
-        m_AntDeviceList.bindItem = (item, index) =>
+        m_AntDeviceListView.bindItem = (item, index) =>
         {
             Debug.Log($"bindItem: index = {index}");
-            item.Q<Label>("device-name").text = m_AntDeviceList.itemsSource[index].ToString();
+            item.Q<Label>("device-name").text = m_AntDeviceListView.itemsSource[index].ToString();
         };
 
-        m_AntDeviceList.unbindItem = (item, index) =>
+        m_AntDeviceListView.unbindItem = (item, index) =>
         {
             Debug.Log($"unbindItem: index = {index}");
         };
-        m_AntDeviceList.destroyItem = (item) => { Debug.Log($"destroyItem: item = {item}"); };
+        m_AntDeviceListView.destroyItem = (item) => { Debug.Log($"destroyItem: item = {item}"); };
 
-        m_AntDeviceList.fixedItemHeight = 45;
-        m_AntDeviceList.itemsSource = new List<AntDevice>();
-        m_AntDeviceList.selectionChanged += OnDeviceSelected;
+        m_AntDeviceListView.fixedItemHeight = 45;
+        m_AntDeviceListView.itemsSource = new List<AntDevice>();
+        m_AntDeviceListView.selectionChanged += OnDeviceSelected;
     }
 
     public void Update()
     {
-        lock (devices.CollectionLock)
+        lock (deviceListLock)
         {
-            if (clearDetails)
-            {
-                Debug.Log("ClearSelection");
-                m_AntDeviceList.ClearSelection();
-                clearDetails = false;
-            }
             if (updateList)
             {
-                Debug.Log($"RefreshItems: m_AntDeviceList count = {m_AntDeviceList.itemsSource.Count}");
-                m_AntDeviceList.RefreshItems();
+                Debug.Log($"Update: update list - m_AntDeviceListView count = {m_AntDeviceListView.itemsSource.Count}");
+                m_AntDeviceListView.RefreshItems();
                 updateList = false;
+            }
+            if (clearDetails)
+            {
+                Debug.Log("Update: clear details");
+                m_AntDeviceListView.ClearSelection();
+                clearDetails = false;
             }
         }
     }
 
     private void Devices_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
     {
-        lock (devices.CollectionLock)
+        lock (deviceListLock)
         {
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:
-                    m_AntDeviceList.itemsSource.Add((AntDevice)e.NewItems[0]);
+                    m_AntDeviceListView.itemsSource.Add((AntDevice)e.NewItems[0]);
                     break;
                 case NotifyCollectionChangedAction.Move:
                     break;
                 case NotifyCollectionChangedAction.Remove:
-                    //clearDetails = m_AntDeviceList.selectedItem.Equals(e.OldItems[0]);
-                    m_AntDeviceList.itemsSource.Remove((AntDevice)e.OldItems[0]);
+                    clearDetails = e.OldItems[0] == m_AntDeviceListView.selectedItem;
+                    m_AntDeviceListView.itemsSource.Remove((AntDevice)e.OldItems[0]);
                     break;
                 case NotifyCollectionChangedAction.Replace:
                     break;
@@ -87,31 +88,33 @@ public class AntDeviceListController
                 default:
                     break;
             }
-            Debug.Log($"Devices_CollectionChanged: m_AntDeviceList count = {m_AntDeviceList.itemsSource.Count}, clearDetails = {clearDetails}");
+            Debug.Log($"Devices_CollectionChanged: m_AntDeviceListView count = {m_AntDeviceListView.itemsSource.Count}, clearDetails = {clearDetails}");
             updateList = true;
         }
     }
 
     private void OnDeviceSelected(IEnumerable<object> enumerable)
     {
-        AntDevice selectedDevice = (AntDevice)m_AntDeviceList.selectedItem;
+        AntDevice selectedDevice = (AntDevice)m_AntDeviceListView.selectedItem;
+        Debug.Log($"OnDeviceSelected: selectedDevice = {selectedDevice}");
 
         // Handle none-selection (Escape to deselect everything)
         if (selectedDevice == null)
         {
-            // Clear
-            Debug.Log($"OnDeviceSelected: Clear");
+            // Clear character details
+            Debug.Log("OnDeviceSelected: clear details");
             m_DeviceClassLabel.text = "";
             m_DeviceNameLabel.text = "";
             m_DevicePortrait.style.backgroundImage = null;
-
-            return;
         }
-
-        // Fill in character details
-        m_DeviceClassLabel.text = selectedDevice.ChannelId.DeviceNumber.ToString();
-        m_DeviceNameLabel.text = selectedDevice.ToString();
-        m_DevicePortrait.style.backgroundImage = new StyleBackground(LoadImageFromAntDevice(selectedDevice));
+        else
+        {
+            // Fill in character details
+            Debug.Log("OnDeviceSelected: fill details");
+            m_DeviceClassLabel.text = selectedDevice.ChannelId.DeviceNumber.ToString();
+            m_DeviceNameLabel.text = selectedDevice.ToString();
+            m_DevicePortrait.style.backgroundImage = new StyleBackground(LoadImageFromAntDevice(selectedDevice));
+        }
     }
 
     private Sprite LoadImageFromAntDevice(AntDevice antDevice)
