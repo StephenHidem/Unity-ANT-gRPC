@@ -3,6 +3,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using SmallEarthTech.AntPlus.Extensions.Hosting;
 using SmallEarthTech.AntRadioInterface;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -19,9 +20,11 @@ public class AntPlus : MonoBehaviour
     private readonly CancellationTokenSource _cancellationTokenSource = new();
 
     // Start is called once before the first execution of Update after the MonoBehavior is created
-    async void Start()
+    void Start()
     {
         Debug.Log("Starting");
+        VisualElement root = GetComponent<UIDocument>().rootVisualElement;
+        _deviceListController = new AntDeviceListController(root);
 
         _host = Host.CreateDefaultBuilder(_options).
             ConfigureLogging(logging =>
@@ -40,21 +43,32 @@ public class AntPlus : MonoBehaviour
 
         // search for an ANT radio server on the local network
         AntRadioService _antRadioService = _host.Services.GetRequiredService<IAntRadio>() as AntRadioService;
-        await _antRadioService.FindAntRadioServerAsync();
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                await _antRadioService.FindAntRadioServerAsync();
+                Debug.Log("FindAntRadioServerAsync exited await");
+                // populate ANT radio server info
+                //root.Q<Label>("product-description").text = _antRadioService.ProductDescription;
+                //root.Q<Label>("server-ip").text = _antRadioService.ServerIPAddress.ToString();
+                //root.Q<Label>("serial-number").text = _antRadioService.SerialNumber.ToString();
+                //root.Q<Label>("version").text = _antRadioService.Version;
 
-        // populate ANT radio server info
-        VisualElement root = GetComponent<UIDocument>().rootVisualElement;
-        root.Q<Label>("product-description").text = _antRadioService.ProductDescription;
-        root.Q<Label>("server-ip").text = _antRadioService.ServerIPAddress.ToString();
-        root.Q<Label>("serial-number").text = _antRadioService.SerialNumber.ToString();
-        root.Q<Label>("version").text = _antRadioService.Version;
+                AntCollection _antDevices = _host.Services.GetRequiredService<AntCollection>();
+                _deviceListController.InitializeAntDeviceList(_antDevices);
 
-        AntCollection _antDevices = _host.Services.GetRequiredService<AntCollection>();
-        _deviceListController = new AntDeviceListController();
-        _deviceListController.InitializeAntDeviceList(root, _antDevices);
-
-        // IMPORTANT: Initiate scanning on a background thread.
-        _ = Task.Run(() => { _ = _antDevices.StartScanning(); });
+                // IMPORTANT: Initiate scanning on a background thread.
+                _ = _antDevices.StartScanning();
+            }
+            catch (OperationCanceledException)
+            {
+                Debug.Log("FindAntRadioServerAsync OperationCanceledException");
+            }
+        });
+        //_ = _antRadioService.FindAntRadioServerAsync().ContinueWith(t =>
+        //{
+        //});
 
         Debug.Log("Running");
     }

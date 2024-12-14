@@ -39,49 +39,51 @@ public class AntRadioService : IAntRadio
         _logger = logger;
         _cts = cancellationTokenSource;
     }
+
     public async Task FindAntRadioServerAsync()
     {
         IPEndPoint multicastEndPoint = new(grpAddress, multicastPort);
         byte[] req = Encoding.ASCII.GetBytes("AntRadioServer discovery request");
         UdpReceiveResult result;
 
-        // loop every 2 seconds sending a message to the any listening servers
-        while (true)
-        {
-            using UdpClient udpClient = new(AddressFamily.InterNetwork);
-            using CancellationTokenSource cts = new(2000);  // retry every 2 seconds
+        // initiate receive
+        using UdpClient udpClient = new(AddressFamily.InterNetwork);
+        var receiveTask = udpClient.ReceiveAsync();
 
+        // loop every 2 seconds sending a message to the any listening servers
+        while (!_cts.IsCancellationRequested)
+        {
             // send request for ANT radio server
             _ = udpClient.Send(req, req.Length, multicastEndPoint);
-            try
+
+            // get response from server, or timeout, or cancelled
+            if (receiveTask.Wait(2000, _cts.Token))
             {
-                // get response from server or timeout
-                result = await udpClient.ReceiveAsync().WithCancellation(cts.Token);
+                result = receiveTask.Result;
                 ServerIPAddress = result.RemoteEndPoint.Address;
                 string msg = Encoding.ASCII.GetString(result.Buffer);
                 _logger.LogInformation("ANT radio endpoint {ServerAddress}, message {Msg}", ServerIPAddress, msg);
+
+                UriBuilder uriBuilder = new("http", ServerIPAddress.ToString(), gRPCPort);
+                _channel = GrpcChannel.ForAddress(
+                    uriBuilder.Uri,
+                    new GrpcChannelOptions
+                    {
+                        HttpHandler = new YetAnotherHttpHandler { Http2Only = true },
+                        DisposeHttpClient = true
+                    });
+                _client = new gRPCAntRadio.gRPCAntRadioClient(_channel);
+                PropertiesReply reply = await _client.GetPropertiesAsync(new Empty());
+                ProductDescription = reply.ProductDescription;
+                SerialNumber = reply.SerialNumber;
+                Version = reply.Version;
                 break;
             }
-            catch (OperationCanceledException)
+            else
             {
-                _logger.LogInformation("FindAntRadioServerAsync: OperationCanceledException. Retry.");
-                udpClient.Dispose();
+                _logger.LogInformation("FindAntRadioServerAsync: Timeout. Retry.");
             }
         }
-
-        UriBuilder uriBuilder = new("http", ServerIPAddress.ToString(), gRPCPort);
-        _channel = GrpcChannel.ForAddress(
-            uriBuilder.Uri,
-            new GrpcChannelOptions
-            {
-                HttpHandler = new YetAnotherHttpHandler { Http2Only = true },
-                DisposeHttpClient = true
-            });
-        _client = new gRPCAntRadio.gRPCAntRadioClient(_channel);
-        PropertiesReply reply = await _client.GetPropertiesAsync(new Empty());
-        ProductDescription = reply.ProductDescription;
-        SerialNumber = reply.SerialNumber;
-        Version = reply.Version;
     }
 
     public async Task<IAntChannel[]> InitializeContinuousScanMode()
