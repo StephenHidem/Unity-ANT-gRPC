@@ -18,13 +18,16 @@ public class AntPlus : MonoBehaviour
     };
     private AntDeviceListController _deviceListController;
     private readonly CancellationTokenSource _cancellationTokenSource = new();
+    private bool _updateAntRadioInfo;
+    private VisualElement _root;
+    private AntRadioService _antRadioService;
 
     // Start is called once before the first execution of Update after the MonoBehavior is created
     void Start()
     {
         Debug.Log("Starting");
-        VisualElement root = GetComponent<UIDocument>().rootVisualElement;
-        _deviceListController = new AntDeviceListController(root);
+        _root = GetComponent<UIDocument>().rootVisualElement;
+        _deviceListController = new AntDeviceListController(_root);
 
         _host = Host.CreateDefaultBuilder(_options).
             ConfigureLogging(logging =>
@@ -42,18 +45,15 @@ public class AntPlus : MonoBehaviour
             Build();
 
         // search for an ANT radio server on the local network
-        AntRadioService _antRadioService = _host.Services.GetRequiredService<IAntRadio>() as AntRadioService;
+        _antRadioService = _host.Services.GetRequiredService<IAntRadio>() as AntRadioService;
         _ = Task.Run(async () =>
         {
             try
             {
                 await _antRadioService.FindAntRadioServerAsync();
-                Debug.Log("FindAntRadioServerAsync exited await");
+
                 // populate ANT radio server info
-                //root.Q<Label>("product-description").text = _antRadioService.ProductDescription;
-                //root.Q<Label>("server-ip").text = _antRadioService.ServerIPAddress.ToString();
-                //root.Q<Label>("serial-number").text = _antRadioService.SerialNumber.ToString();
-                //root.Q<Label>("version").text = _antRadioService.Version;
+                _updateAntRadioInfo = true;
 
                 AntCollection _antDevices = _host.Services.GetRequiredService<AntCollection>();
                 _deviceListController.InitializeAntDeviceList(_antDevices);
@@ -66,9 +66,6 @@ public class AntPlus : MonoBehaviour
                 Debug.Log("FindAntRadioServerAsync OperationCanceledException");
             }
         });
-        //_ = _antRadioService.FindAntRadioServerAsync().ContinueWith(t =>
-        //{
-        //});
 
         Debug.Log("Running");
     }
@@ -77,6 +74,14 @@ public class AntPlus : MonoBehaviour
     void Update()
     {
         _deviceListController?.Update();
+        if (_updateAntRadioInfo)
+        {
+            _updateAntRadioInfo = false;
+            _root.Q<Label>("product-description").text = _antRadioService.ProductDescription;
+            _root.Q<Label>("server-ip").text = _antRadioService.ServerIPAddress.ToString();
+            _root.Q<Label>("serial-number").text = _antRadioService.SerialNumber.ToString();
+            _root.Q<Label>("version").text = _antRadioService.Version;
+        }
     }
 
     private void OnDisable()
