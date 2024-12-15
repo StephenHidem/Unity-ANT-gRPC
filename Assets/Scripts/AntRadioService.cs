@@ -32,7 +32,7 @@ public class AntRadioService : IAntRadio
 
     public string Version { get; private set; }
 
-    public event EventHandler<AntResponse> RadioResponse;
+    public event EventHandler<AntResponse> RadioResponse { add { } remove { } }
 
     public AntRadioService(ILogger<AntRadioService> logger, CancellationTokenSource cancellationTokenSource)
     {
@@ -40,15 +40,19 @@ public class AntRadioService : IAntRadio
         _cts = cancellationTokenSource;
     }
 
+    /// <summary>
+    /// Create a UdpClient and receive task to wait for an ANT radio server response. A message is sent to the
+    /// multi-cast endpoint every 2 seconds until a response is received, timeout, or the receive task is cancelled.
+    /// </summary>
+    /// <returns>A task.</returns>
     public async Task FindAntRadioServerAsync()
     {
         IPEndPoint multicastEndPoint = new(grpAddress, multicastPort);
         byte[] req = Encoding.ASCII.GetBytes("AntRadioServer discovery request");
-        UdpReceiveResult result;
 
         // initiate receive
-        using UdpClient udpClient = new(AddressFamily.InterNetwork);
-        var receiveTask = udpClient.ReceiveAsync();
+        using UdpClient udpClient = new(0);
+        Task<UdpReceiveResult> receiveTask = udpClient.ReceiveAsync();
 
         // loop every 2 seconds sending a message to the any listening servers
         while (!_cts.IsCancellationRequested)
@@ -56,10 +60,10 @@ public class AntRadioService : IAntRadio
             // send request for ANT radio server
             _ = udpClient.Send(req, req.Length, multicastEndPoint);
 
-            // get response from server, or timeout, or cancelled
+            // wait for response from server, timeout, or cancellation
             if (receiveTask.Wait(2000, _cts.Token))
             {
-                result = receiveTask.Result;
+                UdpReceiveResult result = receiveTask.Result;
                 ServerIPAddress = result.RemoteEndPoint.Address;
                 string msg = Encoding.ASCII.GetString(result.Buffer);
                 _logger.LogInformation("ANT radio endpoint {ServerAddress}, message {Msg}", ServerIPAddress, msg);
