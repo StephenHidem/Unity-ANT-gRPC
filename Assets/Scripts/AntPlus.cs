@@ -59,7 +59,7 @@ public class AntPlus : MonoBehaviour
                 _deviceListController.InitializeAntDeviceList(_antDevices);
 
                 // IMPORTANT: Initiate scanning on a background thread.
-                _ = _antDevices.StartScanning();
+                await _antDevices.StartScanning();
             }
             catch (OperationCanceledException)
             {
