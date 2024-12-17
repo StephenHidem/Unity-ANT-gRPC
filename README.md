@@ -1,7 +1,16 @@
+<p align="center">
+  <img src="./SmallEarthTech.png" />
+</p>
+
 # Unity ANT gRPC Example
 This project is a simple example of integrating the AntPlus libraries and hosting
 extensions in a Unity game.
 ## Overview
+The UI consists of ANT radio server info, a ListView to display ANT devices in the AntCollection, and
+a details view that displays the selected ANT device image and device number.
+
+You will need to clone the VS2022 [AntPlus] solution and build the solution in order to run this example.
+
 ## Details
 ### Basic Setup for Unity Projects
 1. Create a Unity project
@@ -21,3 +30,4 @@ That completes the initial steps required.
 
 [NuGetForUnity]: https://github.com/GlitchEnzo/NuGetForUnity
 [YetAnotherHttpHandler]: https://github.com/Cysharp/YetAnotherHttpHandler
+[AntPlus]: https://github.com/StephenHidem/AntPlus
