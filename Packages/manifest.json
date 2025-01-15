@@ -2,6 +2,7 @@
   "dependencies": {
     "com.cysharp.yetanotherhttphandler": "https://github.com/Cysharp/YetAnotherHttpHandler.git?path=src/YetAnotherHttpHandler",
     "com.github-glitchenzo.nugetforunity": "https://github.com/GlitchEnzo/NuGetForUnity.git?path=/src/NuGetForUnity",
+    "com.spoiledcat.git": "1.0.44",
     "com.unity.ai.navigation": "2.0.5",
     "com.unity.collab-proxy": "2.5.2",
     "com.unity.ide.rider": "3.0.34",
