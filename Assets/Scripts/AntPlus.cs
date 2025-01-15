@@ -1,3 +1,6 @@
+using AntGrpcShared.ClientServices;
+using Cysharp.Net.Http;
+using Grpc.Net.Client;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -41,6 +44,7 @@ public class AntPlus : MonoBehaviour
                 // add the ANT radio service and cancellation token to signal app termination
                 services.AddSingleton<IAntRadio, AntRadioService>();
                 services.AddSingleton(_cancellationTokenSource);
+                services.AddSingleton(new GrpcChannelOptions { HttpHandler = new YetAnotherHttpHandler { Http2Only = true }, DisposeHttpClient = true });
             }).
             Build();
 
