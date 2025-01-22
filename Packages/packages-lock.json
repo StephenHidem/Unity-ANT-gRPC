@@ -5,14 +5,14 @@
       "depth": 0,
       "source": "git",
       "dependencies": {},
-      "hash": "a4edf5c97e326c1d858b257e17e58fae09babf65"
+      "hash": "1f499bc99d05372fcdd015d7422d5b189b2d2592"
     },
     "com.github-glitchenzo.nugetforunity": {
       "version": "https://github.com/GlitchEnzo/NuGetForUnity.git?path=/src/NuGetForUnity",
       "depth": 0,
       "source": "git",
       "dependencies": {},
-      "hash": "0d0e4af9c79d63224ae26f1a3e822300b1475da7"
+      "hash": "5764d44d4232c8ea628549137559050ea6f6dc10"
     },
     "com.spoiledcat.git": {
       "version": "1.0.44",
